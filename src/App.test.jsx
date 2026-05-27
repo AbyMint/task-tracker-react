@@ -41,4 +41,14 @@ describe('App', () => {
 
     expect(taskCheckbox).toBeChecked()
   })
+
+  it('switches to dark mode from the selector', async () => {
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /switch to dark mode/i }))
+
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
+  })
 })

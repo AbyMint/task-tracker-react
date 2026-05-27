@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const STORAGE_KEY = 'task-tracker-react.tasks'
+const THEME_STORAGE_KEY = 'task-tracker-react.theme'
 
 function createTask(title, notes, subtasksText) {
   return {
@@ -19,6 +20,23 @@ function createTask(title, notes, subtasksText) {
 
 function canCompleteTask(task) {
   return task.subtasks.every((subtask) => subtask.completed)
+}
+
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
+    </svg>
+  )
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
+    </svg>
+  )
 }
 
 function App() {
@@ -40,10 +58,27 @@ function App() {
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [subtasksText, setSubtasksText] = useState('')
+  const [theme, setTheme] = useState(() => {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      return storedTheme
+    }
+
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+
+    return 'light'
+  })
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
   }, [tasks])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem(THEME_STORAGE_KEY, theme)
+  }, [theme])
 
   const filteredTasks = useMemo(() => {
     if (filter === 'completed') {
@@ -171,8 +206,24 @@ function App() {
     setSubtasksText(task.subtasks.map((subtask) => subtask.text).join('\n'))
   }
 
+  const isDark = theme === 'dark'
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
+  }
+
   return (
     <main className="app">
+      <button
+        type="button"
+        className="theme-toggle"
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        onClick={toggleTheme}
+      >
+        <span className="theme-toggle-icon">{isDark ? <SunIcon /> : <MoonIcon />}</span>
+        <span className="theme-toggle-label">{isDark ? 'Light mode' : 'Dark mode'}</span>
+      </button>
+
       <h1>Task Tracker</h1>
 
       <form className="task-form" onSubmit={handleSubmit}>
