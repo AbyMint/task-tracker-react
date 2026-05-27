@@ -193,6 +193,11 @@ function App() {
   }
 
   const deleteTask = (taskId) => {
+    const shouldDelete = window.confirm('Delete this task? This action cannot be undone.')
+    if (!shouldDelete) {
+      return
+    }
+
     setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId))
     if (editingTaskId === taskId) {
       resetForm()
