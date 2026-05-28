@@ -9,6 +9,7 @@ Simple React task tracker with local storage persistence.
 - Optional subtasks per task
 - Task completion is blocked until all subtasks are completed (when subtasks exist)
 - Notes field on each task
+- Now with dark mode!
 
 ## Run
 ```bash
